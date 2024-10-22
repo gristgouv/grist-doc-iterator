@@ -1,5 +1,7 @@
 # Check backups are made on S3
 
+**Status: ✅ Ready to be used in production**
+
 Check our backups are made on our S3 storage.
 
 ## Prerequisites

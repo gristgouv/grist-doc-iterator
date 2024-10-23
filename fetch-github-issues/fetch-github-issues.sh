@@ -31,7 +31,7 @@ format_project_item() {
   if [ -n "$pr_urls_formatted" ]; then
     echo -n " (PRs: $pr_urls_formatted)"
   fi
-  echo ": "
+  echo ": ... 👥 For our users, it means: ..."
 }
 
 show_done=''

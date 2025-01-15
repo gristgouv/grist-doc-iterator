@@ -1,5 +1,5 @@
-import { $ } from '@wdio/globals'
-import Page from './page.js';
+import { $ } from "@wdio/globals";
+import Page from "./page.js";
 
 /**
  * sub page containing specific selectors and methods for a specific page
@@ -8,27 +8,27 @@ class LoginPage extends Page {
   /**
    * define selectors using getter methods
    */
-  get inputEmail () {
-    return $('#email-input');
+  get inputEmail() {
+    return $("#email-input");
   }
 
-  get inputPassword () {
-    return $('#password-input');
+  get inputPassword() {
+    return $("#password-input");
   }
 
-  get btnSubmit () {
+  get btnSubmit() {
     return $('button[type="submit"]');
   }
 
   get dinumOrgTile() {
-    return $('a*=DINUM');
+    return $("a*=DINUM");
   }
 
   /**
    * a method to encapsule automation code to interact with the page
    * e.g. to login using username and password
    */
-  async login (email, password) {
+  async login(email, password) {
     await this.inputEmail.setValue(email);
     await this.btnSubmit.click();
     await this.inputPassword.setValue(password);
@@ -39,8 +39,8 @@ class LoginPage extends Page {
   /**
    * overwrite specific options to adapt it to page object
    */
-  open () {
-    return super.open('/o/docs/login?next=/');
+  open() {
+    return super.open("/o/docs/login?next=/");
   }
 }
 

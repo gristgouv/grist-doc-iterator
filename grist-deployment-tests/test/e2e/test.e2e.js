@@ -1,10 +1,10 @@
-import { expect } from '@wdio/globals'
-import LoginPage from '../pageobjects/login.page.js'
-import HomePage from '../pageobjects/homepage.page.js'
-import assert from 'assert';
+import assert from "node:assert";
+import { expect } from "@wdio/globals";
+import HomePage from "../pageobjects/homepage.page.js";
+import LoginPage from "../pageobjects/login.page.js";
 
-describe('Login', () => {
-  it('should login and logout with valid credentials using ProConnect OIDC Identity Provider', async () => {
+describe("Login", () => {
+  it("should login and logout with valid credentials using ProConnect OIDC Identity Provider", async () => {
     // Given
     await HomePage.open();
     if (await HomePage.userAgreementPopup.isDisplayed()) {
@@ -13,12 +13,12 @@ describe('Login', () => {
     await HomePage.goToLogin();
 
     // When
-    await LoginPage.login('user@yopmail.com', 'user@yopmail.com')
+    await LoginPage.login("user@yopmail.com", "user@yopmail.com");
 
     // Then
     await expect(HomePage.userIcon).toBeDisplayed();
     await expect(HomePage.loginBtn).not.toBeDisplayed();
-    
+
     // When
     await HomePage.logout();
 
@@ -27,4 +27,3 @@ describe('Login', () => {
     await expect(HomePage.loginBtn).toBeDisplayed();
   });
 });
-

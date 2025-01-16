@@ -31,7 +31,7 @@ format_project_item() {
   if [ -n "$pr_urls_formatted" ]; then
     echo -n " (PRs: $pr_urls_formatted)"
   fi
-  echo ": ... 👥 For our users, it means: ..."
+  echo ""
 }
 
 show_done=''
@@ -139,6 +139,7 @@ if [ "$show_done" = 'true' ] || [ "$archive_items" = 'true' ]; then
       echo ""
       for item in $done; do
         format_project_item "$item"
+        echo ": ... 👥 For our users, it means: ..."
       done
       echo ""
       echo ""
@@ -157,7 +158,7 @@ fi
 if [ "$show_needs_feedback" = 'true' ]; then
   needs_feedback=$(fetch_column "Needs feedback")
   if [ -n "$needs_feedback" ]; then
-    echo "**Needs Review and/or feedback (ordered by priority) 🕵️**"
+    echo "**Needs Review and/or feedback (ordered by priority) 🔎**"
     echo ""
     for item in $needs_feedback; do
       format_project_item "$item"
@@ -197,3 +198,5 @@ if [ "$show_community" = 'true' ]; then
   #   echo ""
   # fi
 fi
+
+echo "Cheers!"

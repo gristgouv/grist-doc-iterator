@@ -10,7 +10,7 @@ Ce projet vise à fournir quelques tests simples pour s'assurer que l'instance c
 
 Vous pouvez exécuter les tests en déclenchant simplement un workflow Github ([voir la documentation Github](https://docs.github.com/fr/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/manually-running-a-workflow)).
 
-Veuillez vous assurer qu'un environnement secret nommé "deployment tests" ([comme défini dans ce fichier de workflow](https://github.com/betagouv/grist-utils/blob/bcb819601f2ec4d3b8decaed7c462b9f50f1bc8a/.github/workflows/grist-deployment-tests.yml#L18C18-L18C28)) est configuré et que ses secrets utilisés dans ce fichier sont définis. Vous pouvez consulter [la documentation Github sur la façon de les définir et de les utiliser](https://docs.github.com/fr/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions) pour en savoir plus.
+Veuillez vous assurer qu'un environnement secret nommé "deployment tests" ([comme défini dans ce fichier de workflow](https://github.com/betagouv/grist-utils/blob/bcb819601f2ec4d3b8decaed7c462b9f50f1bc8a/.github/workflows/grist-deployment-tests.yml#L18C18-L18C28)) est configuré et que les secrets utilisés dans ce fichier sont définis. Vous pouvez consulter [la documentation Github sur la façon de les définir et de les utiliser](https://docs.github.com/fr/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions) pour en savoir plus.
 
 
 ## Running the tests locally

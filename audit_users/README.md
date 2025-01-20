@@ -1,6 +1,6 @@
 # Audit Grist instance
 
-## Status: ✅ Ready to be used in production
+**Status: ✅ Ready to be used in production**
 
 Run some SQL scripts against the Grist home database in order to audit Grist usage by external users.
 In the context of the French administration's instance, this means auditing users that are not public servants.

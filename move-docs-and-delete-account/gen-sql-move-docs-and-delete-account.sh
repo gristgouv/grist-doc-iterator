@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Retrieve arguments passed to the command
 
@@ -78,16 +78,16 @@ UPDATE workspaces set name=(name || '${moved_suffix}'), org_id=(SELECT t.org_id 
 WITH source_and_target_org_id_match as (
   select src_grp.id as src_grp_id, dst_grp.id as dst_grp_id
   from groups src_grp join groups dst_grp on src_grp.name=dst_grp.name
-    join acl_rules src_ar on src_grp.id=src_ar.id 
+    join acl_rules src_ar on src_grp.id=src_ar.id
     join acl_rules dst_ar on dst_grp.id=dst_ar.id
   where src_ar.org_id=(select distinct(org_id) from source_info) and dst_ar.org_id=(select distinct(org_id) from target_info)
 )
-UPDATE group_groups 
+UPDATE group_groups
 set subgroup_id=(select dst_grp_id from source_and_target_org_id_match where src_grp_id=subgroup_id)
 where subgroup_id in (select src_grp_id from source_and_target_org_id_match) returning *; -- Make moved workspace inherit their rights from the target org
 
-update group_users set user_id=(select distinct(user_id) from target_info) 
-where user_id=(select distinct(user_id) from source_info) 
+update group_users set user_id=(select distinct(user_id) from target_info)
+where user_id=(select distinct(user_id) from source_info)
 and not exists (select 1 from group_users gu where group_users.group_id=gu.group_id and gu.user_id=(select distinct(user_id) from target_info))
 returning *; -- Remove every permissions of the old user and grant them to the new one, if not already existing
 

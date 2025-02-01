@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ -z "$USER_API_KEY" ]; then
   echo -n "Api key: "

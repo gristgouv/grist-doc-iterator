@@ -134,6 +134,39 @@ describe("API", function () {
     assert.equal(records[0].fields.A, expectedValue);
   });
 
+  it("should successfully invite a hundred of people", async () => {
+    const docId = await createDoc("doc-invite-test");
+    const emailsToInvite = new Array(99).fill(null).reduce(
+      (acc, _, index) =>
+        Object.assign(acc, {
+          [`user${index + 1}@yopmail.com`]: "viewers",
+        }),
+      {},
+    );
+    const res = await axios.patch(
+      url(`/api/docs/${docId}/access`),
+      {
+        delta: {
+          users: emailsToInvite,
+        },
+      },
+      {
+        headers: headers(),
+      },
+    );
+
+    assert.equal(res.status, 200, "Invitation failed");
+    const resInvitations = await axios.get(url(`/api/docs/${docId}/access`), {
+      headers: headers(),
+    });
+    assert.equal(resInvitations.status, 200, "Get invitations failed");
+    assert.lengthOf(
+      resInvitations.data.users,
+      102,
+      "Does not have the expected number of invitations",
+    );
+  });
+
   // This test ensures that the S3 provider is correctly configured and handles versions correctly.
   it("should successfully create snapshots and restore them", async function () {
     this.timeout("180s");

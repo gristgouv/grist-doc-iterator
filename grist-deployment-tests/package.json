@@ -19,7 +19,7 @@
     "@wdio/cli": "^9.0.7",
     "axios": "^1.7.4",
     "chai": "^5.1.1",
-    "mocha": "^10.7.3"
+    "mocha": "^11.1.0"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

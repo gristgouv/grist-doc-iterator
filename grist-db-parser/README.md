@@ -1,5 +1,7 @@
 # Grist DB parser
 
+**Status: 🧪 Experimental**
+
 Project based on <https://github.com/arnaud-robin/grist-db-parser>
 
 This Python script `grist_parser.py` provides functionality to convert

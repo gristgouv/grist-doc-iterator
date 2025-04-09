@@ -11,7 +11,7 @@ repeat
 
     for _, key in ipairs(result[2]) do
         local token = redis.call('GET', key)
-        if string.find(token, user) then
+        if string.find(token, '"' .. user .. '"') then
           redis.call('UNLINK', key)
           dels = dels + 1
         end

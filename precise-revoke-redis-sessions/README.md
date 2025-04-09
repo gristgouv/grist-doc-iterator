@@ -1,5 +1,7 @@
 # Precisely revoke sessions in Redis
 
+**Status: ✅ Ready to be used in production**
+
 ## Description
 
 This script runs in `redis-cli`.

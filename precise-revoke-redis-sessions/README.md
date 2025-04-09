@@ -6,8 +6,7 @@
 
 This script runs in `redis-cli`.
 It requires access to the Redis instances used by Grist.
-Because the session object in Redis is a JSON object, the script simplifies by just checking if the object contains the username.
-If the username is underspecified, it might delete sessions for other users with similar names.
+Because the session object in Redis is a JSON object, the script simplifies by just checking if the object contains the quoted username.
 
 ## Usage
 

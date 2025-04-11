@@ -177,9 +177,13 @@ describe("API", function () {
     assert.equal(records[0].fields.A, expectedValue);
   });
 
-  it("should successfully invite a hundred of people", async () => {
+  it("should successfully invite 100 users", async () => {
     const docId = await createDoc("doc-invite-test");
-    const emailsToInvite = new Array(99).fill(null).reduce(
+    const resInvitationsBefore = await axios.get(url(`/api/docs/${docId}/access`), {
+      headers: headers(),
+    });
+    const numUsersBefore = resInvitationsBefore.data.users.length;
+    const emailsToInvite = new Array(100).fill(null).reduce(
       (acc, _, index) =>
         Object.assign(acc, {
           [`user${index + 1}@yopmail.com`]: "viewers",
@@ -205,7 +209,7 @@ describe("API", function () {
     assert.equal(resInvitations.status, 200, "Get invitations failed");
     assert.lengthOf(
       resInvitations.data.users,
-      102,
+      numUsersBefore + 100,
       "Does not have the expected number of invitations",
     );
   });

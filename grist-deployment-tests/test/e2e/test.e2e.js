@@ -7,8 +7,8 @@ describe("Login", () => {
   it("should login and logout with valid credentials using ProConnect OIDC Identity Provider", async () => {
     // Given
     await HomePage.open();
-    if (await HomePage.userAgreementPopup.isDisplayed()) {
-      await HomePage.acceptUserAgreements();
+    if (await HomePage.maintenancePopin.isDisplayed()) {
+      await HomePage.acknowledgeMaintenance();
     }
     await HomePage.goToLogin();
 

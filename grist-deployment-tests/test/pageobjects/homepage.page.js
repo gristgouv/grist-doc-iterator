@@ -20,16 +20,16 @@ class HomePage extends Page {
     return $(".test-dm-log-out");
   }
 
-  get userAgreementPopup() {
-    return $("#agreementPopin");
+  get maintenancePopin() {
+    return $("#maintenancePopin");
   }
 
-  get userAgreementCheckbox() {
-    return $("#jaccepte");
+  get acknowledgeMaintenanceCheckbox() {
+    return $("#jaiCompris");
   }
 
-  get userAgreementSubmitBtn() {
-    return $("#fermerPopinAgreement");
+  get closeMaintenancePopinBtn() {
+    return $("#fermerPopinMaintenance");
   }
 
   open() {
@@ -45,9 +45,9 @@ class HomePage extends Page {
     await this.logoutMenu.click();
   }
 
-  async acceptUserAgreements() {
-    await this.userAgreementCheckbox.click();
-    await this.userAgreementSubmitBtn.click();
+  async acknowledgeMaintenance() {
+    await this.acknowledgeMaintenanceCheckbox.click();
+    await this.closeMaintenancePopinBtn.click();
   }
 }
 

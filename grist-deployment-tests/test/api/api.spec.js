@@ -179,11 +179,19 @@ describe("API", function () {
 
   it("should successfully invite 100 users", async () => {
     const docId = await createDoc("doc-invite-test");
-    const resInvitationsBefore = await axios.get(url(`/api/docs/${docId}/access`), {
-      headers: headers(),
-    });
+    const resInvitationsBefore = await axios.get(
+      url(`/api/docs/${docId}/access`),
+      {
+        headers: headers(),
+      },
+    );
     const numUsersBefore = resInvitationsBefore.data.users.length;
-    assert.isFalse(resInvitationsBefore.data.users.some((u) => u.email.match(/user\d+@yopmail\.com/)), "Already have fake yopmail users, please clean up the org.");
+    assert.isFalse(
+      resInvitationsBefore.data.users.some((u) =>
+        u.email.match(/user\d+@yopmail\.com/),
+      ),
+      "Already have fake yopmail users, please clean up the org.",
+    );
     const emailsToInvite = new Array(100).fill(null).reduce(
       (acc, _, index) =>
         Object.assign(acc, {

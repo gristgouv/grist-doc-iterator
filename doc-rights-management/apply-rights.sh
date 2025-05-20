@@ -2,6 +2,10 @@
 
 set -eEu -o pipefail
 
+PRODUCTION_ENVS=(
+  "grist.incubateur.anct.gouv.fr"
+  "grist.numerique.gouv.fr"
+)
 
 headers=(--header "Authorization: Bearer ${TARGET_BEARER}" --header "Content-type: application/json")
 
@@ -27,7 +31,7 @@ body=$(cat "${RIGHTS}" | jq --arg max_inherited_role "${MAX_INHERITED_ROLE:-owne
   {"delta": {"maxInheritedRole": $max_inherited_role, "users": .}}')
 
 # Simple control of the target domain to ensure we know what we do.
-if [ "$TARGET_DOMAIN" == "grist.incubateur.anct.gouv.fr" ] || [ "$TARGET_DOMAIN" == "grist.numerique.gouv.fr" ]; then
+if [[ " ${PRODUCTION_ENVS[*]} " =~ [[:space:]]${TARGET_DOMAIN}[[:space:]] ]]; then
   read -r -p "Production domain detected, continue ? [y/N] " continue
   if [ "${continue,,}" != 'y' ]; then
     echo "exiting"

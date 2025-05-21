@@ -14,6 +14,12 @@ It produces a markdown output but it can be combined with pandoc to output in ot
 
 ## Usage
 
+### fetch-github-issues.sh
+
 Run `./fetch-github-issuers.sh --help` to show the usage.
 
 It is recommended to use `-A` to archive the issues Done this week.
+
+### archive-github-issues.sh
+
+Just run `./archive-github-issues.sh` to archive items that are currently in the "Done" column.

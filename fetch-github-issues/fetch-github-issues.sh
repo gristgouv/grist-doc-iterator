@@ -48,7 +48,6 @@ format_project_item() {
 show_done=''
 show_needs_feedback=''
 show_in_progress=''
-archive_items=''
 show_community=''
 
 while [[ $# -gt 0 ]]; do
@@ -66,9 +65,6 @@ while [[ $# -gt 0 ]]; do
       show_in_progress='true'
       shift
       ;;
-    -A|--archive-done)
-      archive_items='true'
-      shift;;
     -C|--community)
       show_community='true'
       shift
@@ -101,18 +97,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [ -z "$archive_items" ] && [ -z "$show_done" ] && [ -z "$show_needs_feedback" ] && [ -z "$show_in_progress" ]; then
+if [ -z "$show_done" ] && [ -z "$show_needs_feedback" ] && [ -z "$show_in_progress" ]; then
   show_done='true'
   show_needs_feedback='true'
   show_in_progress='true'
   show_community='true'
-fi
-
-if [ -n "$archive_items" ] && { 
-  [ -n "$show_done" ] || [ -n "$show_needs_feedback" ] || [ -n "$show_in_progress" ] || [ -n "$show_community" ]
-} ; then
-  echo "Error: --archive-done cannot be used with other options"
-  exit 1
 fi
 
 gh=$(which gh)
@@ -183,28 +172,18 @@ if [ "$show_needs_feedback" = 'true' ]; then
   fi
 fi
 
-if [ "$show_done" = 'true' ] || [ "$archive_items" = 'true' ]; then
+if [ "$show_done" = 'true' ]; then
   done=$(get_column_items "Done")
   if [ -n "$done" ]; then
-    if [ "$show_done" = 'true' ]; then
-      echo "**Newly merged 🎉**"
-      echo "thanks for your reviews! 🙏"
-      echo ""
-      for item in $done; do
-        format_project_item "$item" | sed -z 's/\n$//g'
-        echo ": ... 👥 For our users, it means: ..."
-      done
-      echo ""
-      echo ""
-    fi
-
-    if [ "$archive_items" = 'true' ]; then
-      for item in $done; do
-        id=$(echo "$item" | jq -r '.id')
-        echo "Archiving item $id..."
-        gh project item-archive $PROJECT_ID --owner $OWNER_NAME --id "$id"
-      done
-    fi
+    echo "**Newly merged 🎉**"
+    echo "thanks for your reviews! 🙏"
+    echo ""
+    for item in $done; do
+      format_project_item "$item" | sed -z 's/\n$//g'
+      echo ": ... 👥 For our users, it means: ..."
+    done
+    echo ""
+    echo ""
   fi
 fi
 

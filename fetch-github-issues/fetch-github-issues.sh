@@ -12,7 +12,7 @@ get_column_items() {
 }
 
 get_needs_feedback_column_by_priority() {
-  priority=$1
+  local priority=$1
   get_column_items "Needs feedback" | jq -c "select(.priority == \"$priority\")"
 }
 
@@ -179,8 +179,8 @@ if [ "$show_done" = 'true' ]; then
     echo "thanks for your reviews! 🙏"
     echo ""
     for item in $done; do
-      format_project_item "$item" | sed -z 's/\n$//g'
-      echo ": ... 👥 For our users, it means: ..."
+      formatted_item=$(format_project_item "$item")
+      printf "%s: ... 👥 For our users, it means: ..." "$formatted_item" # printf removes the last newline from $formatted_item
     done
     echo ""
     echo ""
@@ -220,6 +220,6 @@ fi
 
 echo "Cheers!"
 
-if [ "${no_cleanup:-}" == "true" ]; then
+if [ "${no_cleanup:-}" != "true" ]; then
   rm "$output"
 fi

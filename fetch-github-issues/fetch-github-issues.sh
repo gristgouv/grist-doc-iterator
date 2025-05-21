@@ -5,8 +5,19 @@ set -eEuo pipefail
 PROJECT_ID=1
 OWNER_NAME=gristlabs
 
-fetch_column() {
-  gh project item-list $PROJECT_ID --owner $OWNER_NAME --format json -L "$item_count" -q ".items[] | select(.status == \"$1\")" | jq -c
+output=$(mktemp --suffix=".issues-gh.json")
+
+get_column_items() {
+  jq -c ".items[] | select(.status == \"$1\")" < "$output"
+}
+
+get_needs_feedback_column_by_priority() {
+  priority=$1
+  get_column_items "Needs feedback" | jq -c "select(.priority == \"$priority\")"
+}
+
+get_needs_feedback_column_without_priority() {
+  get_column_items "Needs feedback" | jq -c "select(.priority == null)"
 }
 
 fetch_prs_with_label() {
@@ -62,6 +73,9 @@ while [[ $# -gt 0 ]]; do
       show_community='true'
       shift
       ;;
+    --no-cleanup)
+      no_cleanup='true'
+      shift;;
     -h|--help)
       echo "This script fetches the issues from a Github project and formats them in markdown."
       echo "Usage: $0 [-D|--done] [-N|--needs-feedback] [-I|--in-progress] [-A|--archive-done] [-c|--community] [-h|--help]"
@@ -114,6 +128,8 @@ if ! gh project --help > /dev/null ; then
 fi
 
 item_count=$(gh project view $PROJECT_ID --owner $OWNER_NAME -q '.items.totalCount' --format json)
+gh project item-list $PROJECT_ID --owner $OWNER_NAME --format json -L "$item_count" > "$output"
+
 if [ "$item_count" -eq 0 ]; then
   echo "No issues found in the project"
   exit 0
@@ -122,7 +138,7 @@ fi
 cat <<EOF
 Hello there! 👋
 
-Below an update of our work!
+Please find below an update of our work and our needs for feedback or help!
 
 
 
@@ -130,15 +146,52 @@ EOF
 
 IFS=$'\n'
 
+if [ "$show_needs_feedback" = 'true' ]; then
+  needs_feedback_p0=$(get_needs_feedback_column_by_priority "P0")
+  needs_feedback_p1=$(get_needs_feedback_column_by_priority "P1")
+  needs_feedback_p2=$(get_needs_feedback_column_by_priority "P2" && echo && get_needs_feedback_column_without_priority)
+  if [ -n "$needs_feedback_p0" ]; then
+    echo "**🔝 HIGH PRIORITY: Needs Review or feedback**"
+    echo ""
+    for item in $needs_feedback_p0; do
+      format_project_item "$item"
+    done
+    echo ""
+    echo "Other news in the thread below 🧵⤵️"
+    echo ""
+    echo "---"
+  fi
+
+  if [ -n "$needs_feedback_p1" ]; then
+    echo "**🙏 Medium priority: Needs Review or feedback**"
+    echo ""
+    for item in $needs_feedback_p1; do
+      format_project_item "$item"
+    done
+    echo ""
+    echo ""
+  fi
+
+  if [ -n "$needs_feedback_p2" ]; then
+    echo "**Low priority: Needs Review or feedback**"
+    echo ""
+    for item in $needs_feedback_p2; do
+      format_project_item "$item"
+    done
+    echo ""
+    echo ""
+  fi
+fi
+
 if [ "$show_done" = 'true' ] || [ "$archive_items" = 'true' ]; then
-  done=$(fetch_column "Done")
+  done=$(get_column_items "Done")
   if [ -n "$done" ]; then
     if [ "$show_done" = 'true' ]; then
       echo "**Newly merged 🎉**"
       echo "thanks for your reviews! 🙏"
       echo ""
       for item in $done; do
-        format_project_item "$item"
+        format_project_item "$item" | sed -z 's/\n$//g'
         echo ": ... 👥 For our users, it means: ..."
       done
       echo ""
@@ -155,21 +208,8 @@ if [ "$show_done" = 'true' ] || [ "$archive_items" = 'true' ]; then
   fi
 fi
 
-if [ "$show_needs_feedback" = 'true' ]; then
-  needs_feedback=$(fetch_column "Needs feedback")
-  if [ -n "$needs_feedback" ]; then
-    echo "**Needs Review and/or feedback (ordered by priority) 🔎**"
-    echo ""
-    for item in $needs_feedback; do
-      format_project_item "$item"
-    done
-    echo ""
-    echo ""
-  fi
-fi
-
 if [ "$show_in_progress" = 'true' ]; then
-  in_progress=$(fetch_column "In Progress")
+  in_progress=$(get_column_items "In Progress")
   if [ -n "$in_progress" ]; then
     echo "**In Progress 🚧**"
     echo ""
@@ -200,3 +240,7 @@ if [ "$show_community" = 'true' ]; then
 fi
 
 echo "Cheers!"
+
+if [ "${no_cleanup:-}" == "true" ]; then
+  rm "$output"
+fi

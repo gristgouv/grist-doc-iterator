@@ -181,6 +181,7 @@ if [ "$show_done" = 'true' ]; then
     for item in $done; do
       formatted_item=$(format_project_item "$item")
       printf "%s: ... 👥 For our users, it means: ..." "$formatted_item" # printf removes the last newline from $formatted_item
+      echo ""
     done
     echo ""
     echo ""

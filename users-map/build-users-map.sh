@@ -43,7 +43,7 @@ if [ -f "$destination" ]; then
 fi
 
 search_patterns=$(mktemp --suffix="siretloc.search.txt")
-$CSVTOOL namedcol siret /tmp/2025-06-15-all-users.csv | \
+$CSVTOOL namedcol siret "$all_users_csv" | \
   # keep only unique values for SIRETs
   sort -u | \
   # Discard any unrelevant values (and the header)
@@ -58,7 +58,7 @@ if [ "$stock_etablissement" == "" ]; then
   stock_etablissement_dir=$(mktemp --directory --suffix="stock_etablissement")
   mkdir -p "$stock_etablissement_dir"
   stock_etablissement="${stock_etablissement_dir}/StockEtablissementActif_utf8_geo.csv.gz"
-  info "Downloading $stock_etablissement, may take a wile"
+  info "Downloading $stock_etablissement, may take a while"
   $CURL "https://files.data.gouv.fr/geo-sirene/last/StockEtablissementActif_utf8_geo.csv.gz" > "$stock_etablissement"
 fi
 

@@ -86,8 +86,8 @@ while read -r line; do
     echo "$line,," >> "$destination"
     continue
   fi
-  # search for the SIRET in the grepped_etablissements_with_loc file
-  loc=$(grep -Po "^$siret,\K.*" "$grepped_etablissements_with_loc" || true)
+  # search for the SIRET in the grepped_etablissements_with_loc file and retrieve the location values only
+  loc=$(sed -n "s/^$siret,//p" "$grepped_etablissements_with_loc" || true)
   if [ -n "$loc" ]; then
     # if found, append the line to the destination file
     echo "$line,$loc" >> "$destination"

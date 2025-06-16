@@ -17,12 +17,12 @@ info() {
   echo "$@"
 }
 
-if [ -z "$(which "$CSVTOOL")" ]; then
+if ! command -v "$CSVTOOL" >/dev/null; then
   error "Please install csvtool (\`apt install csvtool\` on debian-based linux distro) or provide it through the CSVTOOL env var"
   exit 1
 fi
 
-if [ -z "$(which "$CURL")" ]; then
+if ! command -v "$CURL" >/dev/null; then
   error "Please install curl (\`apt install curl\` on debian-based linux distro) or provide it through the CURL env var"
   exit 1
 fi

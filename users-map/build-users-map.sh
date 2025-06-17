@@ -69,6 +69,7 @@ fi
 
 grepped_etablissements_with_loc=$(mktemp --suffix="grepped_etablissements.csv")
 
+info "Searching for \"Etablissements\" (may take a while)"
 cat << EOF | $CSVTOOL namedcol "siret,longitude,latitude" - > "$grepped_etablissements_with_loc"
 $($cat "$stock_etablissement" | head -n 1)
 $($cat "$stock_etablissement" | grep --file="$search_patterns")
@@ -78,10 +79,22 @@ EOF
 # csvtool join does not seem to work as we would like and seems very complex, let's yolo iterate on the document and grep
 
 siret_col_pos=$(head -n 1 "$all_users_csv" | grep -o "^.*siret" | tr -dc ',' | awk '{ print length + 1; }')
+email_col_pos=$(head -n 1 "$all_users_csv" | grep -o "^.*email" | tr -dc ',' | awk '{ print length + 1; }')
+
 # Print the header
+info "Generating destination"
 echo "$(head -n 1 "$all_users_csv"),longitude,latitude" > "$destination"
+declare -A unique_emails
 
 while read -r line; do
+  if [ "${DEDUP:-0}" == "1" ]; then
+    email=$(echo "$line" | csvtool col "$email_col_pos" - | tr '[:upper:]' '[:lower:]')
+    if [ -n "${unique_emails["$email"]:-}" ]; then # If the email has already been processed, skip
+      continue
+    fi
+    unique_emails["$email"]=true
+  fi
+
   # extract the SIRET from the line, it is at the position $siret_col_pos
   siret=$(echo "$line" | csvtool col "$siret_col_pos" - | sed "$SED_NORMALIZE_REPLACE")
   if [ -z "$siret" ]; then

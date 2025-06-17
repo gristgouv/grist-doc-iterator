@@ -78,6 +78,8 @@ EOF
 # csvtool join does not seem to work as we would like and seems very complex, let's yolo iterate on the document and grep
 
 siret_col_pos=$(head -n 1 "$all_users_csv" | grep -o "^.*siret" | tr -dc ',' | awk '{ print length + 1; }')
+# Print the header
+echo "$(head -n 1 "$all_users_csv"),longitude,latitude" > "$destination"
 
 while read -r line; do
   # extract the SIRET from the line, it is at the position $siret_col_pos
@@ -95,7 +97,7 @@ while read -r line; do
     # if not found, append the line with empty longitude and latitude
     echo "$line,," >> "$destination"
   fi
-done < "$all_users_csv"
+done < <(tail -n +2 "$all_users_csv") # `tail -n +2` ignores the first line
 
 if [ "${CLEANUP:-0}" == "1" ]; then
   rm "$search_patterns"

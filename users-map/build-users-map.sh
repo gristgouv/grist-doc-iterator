@@ -7,7 +7,7 @@ CURL=${CURL:-curl}
 all_users_csv="${1:-}"
 destination="${2:-}"
 
-SED_NORMALIZE_REPLACE='s/\s*//g'
+SED_NORMALIZE_REPLACE='s/[[:space:]]//g'
 
 error() {
   echo "$@" >&2

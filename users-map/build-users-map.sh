@@ -88,7 +88,7 @@ declare -A unique_emails
 
 while read -r line; do
   if [ "${DEDUP:-0}" == "1" ]; then
-    email=$(echo "$line" | csvtool col "$email_col_pos" -)
+    email=$(echo "$line" | csvtool col "$email_col_pos" - | tr '[:upper:]' '[:lower:]')
     if [ -n "${unique_emails["$email"]:-}" ]; then # If the email has already been processed, skip
       continue
     fi

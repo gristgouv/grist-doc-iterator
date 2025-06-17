@@ -17,6 +17,12 @@ info() {
   echo "$@"
 }
 
+col_pos() {
+  csv=$1
+  col=$2
+  head -n 1 "$csv" | awk -F',' "{for(i=1;i<=NF;i++) if(\$i==\"$col\") print i}"
+}
+
 if ! command -v "$CSVTOOL" >/dev/null; then
   error "Please install csvtool (\`apt install csvtool\` on debian-based linux distro) or provide it through the CSVTOOL env var"
   exit 1
@@ -78,25 +84,35 @@ EOF
 
 # csvtool join does not seem to work as we would like and seems very complex, let's yolo iterate on the document and grep
 
-siret_col_pos=$(head -n 1 "$all_users_csv" | grep -o "^.*siret" | tr -dc ',' | awk '{ print length + 1; }')
-email_col_pos=$(head -n 1 "$all_users_csv" | grep -o "^.*email" | tr -dc ',' | awk '{ print length + 1; }')
+siret_col_pos=$(col_pos "$all_users_csv" "siret")
+email_col_pos=$(col_pos "$all_users_csv" "email")
 
 # Print the header
 info "Generating destination"
 echo "$(head -n 1 "$all_users_csv"),longitude,latitude" > "$destination"
+MISSING_SIRET_VALUE="MISSING_SIRET_VALUE"
 declare -A unique_emails
 
 while read -r line; do
-  if [ "${DEDUP:-0}" == "1" ]; then
-    email=$(echo "$line" | csvtool col "$email_col_pos" - | tr '[:upper:]' '[:lower:]')
-    if [ -n "${unique_emails["$email"]:-}" ]; then # If the email has already been processed, skip
-      continue
-    fi
-    unique_emails["$email"]=true
-  fi
-
   # extract the SIRET from the line, it is at the position $siret_col_pos
   siret=$(echo "$line" | csvtool col "$siret_col_pos" - | sed "$SED_NORMALIZE_REPLACE")
+
+  if [ "${DEDUP:-0}" == "1" ]; then
+    email=$(echo "$line" | csvtool col "$email_col_pos" - | tr '[:upper:]' '[:lower:]')
+    if [ -n "$siret" ] && [ -n "$email" ] && [ "${unique_emails["$email"]:-}" == "$MISSING_SIRET_VALUE" ]; then
+      # Note: in destination, email are already normalized
+      # grep: -F to treat pattern as plain text and not as regex, -x to only match the whole line, and -n to prepend with line number
+      linenum_to_del="$(csvtool namedcol "email" "$destination" | grep -Fxn "$email" | cut -d ":" -f1)"
+
+      # Delete the line with the same email in the destination file
+      [ -n "$linenum_to_del" ] && sed -i "${linenum_to_del}d" "$destination"
+
+    elif [ -z "$email" ] || [ -n "${unique_emails["$email"]:-}" ]; then # If the email has already been processed, skip
+      continue
+    fi
+    unique_emails["$email"]="${siret:-$MISSING_SIRET_VALUE}"
+  fi
+
   if [ -z "$siret" ]; then
     echo "$line,," >> "$destination"
     continue

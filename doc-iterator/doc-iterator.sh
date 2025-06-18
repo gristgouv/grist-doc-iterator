@@ -109,9 +109,10 @@ done
 # Check if we can list the S3 path
 
 # List all .grist files in the S3 path, except those that contain a ~
-files=$(minio_retry ls --json "$s3_path" | jq -r '.key | select(test("^[^~]+.grist$"))')
+files=$(minio_retry ls --json "$s3_path" | jq -r '.key | select(test("^[^~]+\\.grist$"))')
 
 dest_tmp_dir=$(mktemp -d)
+trap 'rm -rf "$dest_tmp_dir"' EXIT
 
 for file in $files; do
   # Download the file to a temporary location
@@ -120,6 +121,7 @@ for file in $files; do
   tmp_file_sha256="${tmp_file}.sha256"
   if ! minio_retry get "$remote_path" "$tmp_file" &>/dev/null; then
     error "File does not exist, skip: $remote_path"
+    continue
   fi
   sha256sum "$tmp_file" > "$tmp_file_sha256"
 

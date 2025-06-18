@@ -39,6 +39,14 @@ while [[ $# -gt 0 ]]; do
       verbose=true
       shift
       ;;
+    --exclude=*)
+      exclude="${1#*=}"
+      shift
+      ;;
+    -x)
+      exclude="${2}"
+      shift 2
+      ;;
     -*)
       echo "Unknown option: $1"
       help=true
@@ -58,11 +66,12 @@ done
 if $help; then
   echo "Usage: ./doc-iterator/doc-iterator.sh [OPTIONS] s3_path scripts..."
   echo "Options:"
-  echo "  -h, --help            Show this help message and exit"
-  echo "  -w, --write           Push back changes to S3 if the document has changed"
-  echo "  -v, --verbose         Enable verbose output"
-  echo "  s3_path               The S3 path to the docs"
-  echo "  scripts               The scripts to run on the downloaded files"
+  echo "  -h, --help              Show this help message and exit"
+  echo "  -w, --write             Push back changes to S3 if the document has changed"
+  echo "  -x, --exclude=PATTERN   Exclude documents from the iterator matching the given pattern (must be compatible with grep)"
+  echo "  -v, --verbose           Enable verbose output"
+  echo "  s3_path                 The S3 path to the docs"
+  echo "  scripts                 The scripts to run on the downloaded files"
   echo ""
   echo "Environment Variables:"
   echo "  MINIO_MC       The MinIO client command (default: mc)"
@@ -110,6 +119,9 @@ done
 
 # List all .grist files in the S3 path, except those that contain a ~
 files=$(minio_retry ls --json "$s3_path" | jq -r '.key | select(test("^[^~]+\\.grist$"))')
+if [ -n "${exclude:-}" ]; then
+  files=$(echo "$files" | grep -v "$exclude")
+fi
 
 dest_tmp_dir=$(mktemp -d)
 trap 'rm -rf "$dest_tmp_dir"' EXIT

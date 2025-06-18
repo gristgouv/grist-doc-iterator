@@ -86,7 +86,7 @@ if [[ -z "${s3_path:-}" ]]; then
 fi
 
 # Check if scripts are set
-if [[ -z "${scripts:-}" ]]; then
+if [ "${#scripts[@]}" -eq 0 ]; then
   error "No scripts provided."
   exit 1
 fi
@@ -101,7 +101,7 @@ minio_retry() {
     if $MINIO_MC "$@"; then
       return 0
     fi
-    debug "Problem occurred while running $MINIO_MC $*. Retry according to the fibonacci suit"
+    debug "Problem occurred while running $MINIO_MC $*. Retry according to the fibonacci sequence"
   done
   error "Failed to run command $MINIO_MC $*"
   return 1

@@ -5,7 +5,7 @@
 ⚠️: Despite our efforts to avoid bugs in this script, please check your
 backups before running it, especially if you intend to use the `-w` option.
 
-This script allows you to run scripts on each Grist documents in your S3 bucket.
+This script allows you to run scripts on each Grist document in your S3 bucket.
 
 ## Use case
 

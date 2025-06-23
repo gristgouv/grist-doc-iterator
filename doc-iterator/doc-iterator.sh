@@ -47,6 +47,14 @@ while [[ $# -gt 0 ]]; do
       exclude="${2}"
       shift 2
       ;;
+    --exclude-file=*)
+      exclude_file="${1#*=}"
+      shift
+      ;;
+    -X)
+      exclude_file="${2}"
+      shift 2
+      ;;
     -*)
       echo "Unknown option: $1"
       help=true
@@ -121,6 +129,9 @@ done
 files=$(minio_retry ls --json "$s3_path" | jq -r '.key | select(test("^[^~]+\\.grist$"))')
 if [ -n "${exclude:-}" ]; then
   files=$(echo "$files" | grep -v "$exclude")
+fi
+if [ -n "${exclude_file:-}" ]; then
+  files=$(echo "$files" | grep -v -f "$exclude_file")
 fi
 
 dest_tmp_dir=$(mktemp -d)

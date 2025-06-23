@@ -39,6 +39,22 @@ while [[ $# -gt 0 ]]; do
       verbose=true
       shift
       ;;
+    --only=*)
+      only="${1#*=}"
+      shift
+      ;;
+    -o)
+      only="${2}"
+      shift 2
+      ;;
+    --only-from-file=*)
+      only_from_file="${1#*=}"
+      shift
+      ;;
+    -O)
+      only_from_file="${2}"
+      shift 2
+      ;;
     --exclude=*)
       exclude="${1#*=}"
       shift
@@ -47,12 +63,12 @@ while [[ $# -gt 0 ]]; do
       exclude="${2}"
       shift 2
       ;;
-    --exclude-file=*)
-      exclude_file="${1#*=}"
+    --exclude-from-file=*)
+      exclude_from_file="${1#*=}"
       shift
       ;;
     -X)
-      exclude_file="${2}"
+      exclude_from_file="${2}"
       shift 2
       ;;
     -*)
@@ -74,12 +90,15 @@ done
 if $help; then
   echo "Usage: ./doc-iterator/doc-iterator.sh [OPTIONS] s3_path scripts..."
   echo "Options:"
-  echo "  -h, --help              Show this help message and exit"
-  echo "  -w, --write             Push back changes to S3 if the document has changed"
-  echo "  -x, --exclude=PATTERN   Exclude documents from the iterator matching the given pattern (must be compatible with grep)"
-  echo "  -v, --verbose           Enable verbose output"
-  echo "  s3_path                 The S3 path to the docs"
-  echo "  scripts                 The scripts to run on the downloaded files"
+  echo "  -h, --help                              Show this help message and exit"
+  echo "  -o, --only                              Include only documents matching the given pattern (must be compatible with grep)"
+  echo "  -O, --only-from-file=/path/to/file      Include only documents matching the given pattern (must be compatible with grep)"
+  echo "  -w, --write                             Push back changes to S3 if the document has changed"
+  echo "  -x, --exclude=PATTERN                   Exclude documents matching the given pattern (must be compatible with grep)"
+  echo "  -X, --exclude-from-file=/path/to/file   Exclude documents matching the patterns specified in the given file (must be compatible with grep)"
+  echo "  -v, --verbose                           Enable verbose output"
+  echo "  s3_path                                 The S3 path to the docs"
+  echo "  scripts                                 The scripts to run on the downloaded files"
   echo ""
   echo "Environment Variables:"
   echo "  MINIO_MC       The MinIO client command (default: mc)"
@@ -127,11 +146,19 @@ done
 
 # List all .grist files in the S3 path, except those that contain a ~
 files=$(minio_retry ls --json "$s3_path" | jq -r '.key | select(test("^[^~]+\\.grist$"))')
+
+# Apply the filters
+if [ -n "${only_from_file:-}" ]; then
+  files=$(echo "$files" | grep -f "$only_from_file")
+fi
+if [ -n "${only:-}" ]; then
+  files=$(echo "$files" | grep "$only")
+fi
+if [ -n "${exclude_from_file:-}" ]; then
+  files=$(echo "$files" | grep -v -f "$exclude_from_file")
+fi
 if [ -n "${exclude:-}" ]; then
   files=$(echo "$files" | grep -v "$exclude")
-fi
-if [ -n "${exclude_file:-}" ]; then
-  files=$(echo "$files" | grep -v -f "$exclude_file")
 fi
 
 dest_tmp_dir=$(mktemp -d)

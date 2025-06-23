@@ -10,7 +10,7 @@ This script allows you to run scripts on each Grist document in your S3 bucket.
 ## Use case
 
 It covers many use cases:
- - you want to extract information about each documents (like the widgets being used);
+ - you want to extract information about each document (like the widgets being used);
  - you want to vacuum the documents to reduce their size;
  - ...
 

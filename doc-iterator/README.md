@@ -14,6 +14,8 @@ It covers many use cases:
  - you want to vacuum the documents to reduce their size;
  - ...
 
+💡 Notes: You have published under the [`scripts/`](scripts/) subfolder some scripts that may be of interest.
+
 ## Usage
 
 See `./doc-iterator.sh --help`.

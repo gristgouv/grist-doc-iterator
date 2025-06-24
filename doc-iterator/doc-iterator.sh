@@ -162,7 +162,13 @@ if [ -n "${exclude:-}" ]; then
 fi
 
 dest_tmp_dir=$(mktemp -d)
-trap 'rm -rf "$dest_tmp_dir"' EXIT
+
+cleanup() {
+  find "$dest_tmp_dir" -type f -name "*.grist" -exec shred -z {} \;
+  rm -rf "$dest_tmp_dir"
+}
+
+trap "cleanup" EXIT
 
 for file in $files; do
   # Download the file to a temporary location
@@ -194,5 +200,5 @@ for file in $files; do
   fi
 
   # Remove the temporary file
-  rm -f "$tmp_file" "$tmp_file_sha256"
+  shred -zu "$tmp_file" "$tmp_file_sha256"
 done

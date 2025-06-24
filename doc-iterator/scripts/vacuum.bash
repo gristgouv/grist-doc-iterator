@@ -15,7 +15,7 @@ if [ -f "$VACUUMED" ]; then
 fi
 
 cleanup() {
-  rm -f "$VACUUMED"
+  [ -f "$VACUUMED" ] && shred -zu "$VACUUMED"
 }
 
 trap "cleanup" EXIT

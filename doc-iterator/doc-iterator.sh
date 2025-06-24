@@ -22,7 +22,7 @@ info() {
 }
 
 error() {
-  echo -e "\033[31mERROR:" "$@" "\033[0m"
+  echo -e "\033[31mERROR:" "$@" "\033[0m" >&2
 }
 
 while [[ $# -gt 0 ]]; do
@@ -196,4 +196,3 @@ for file in $files; do
   # Remove the temporary file
   rm -f "$tmp_file" "$tmp_file_sha256"
 done
-rm -rf "$dest_tmp_dir"

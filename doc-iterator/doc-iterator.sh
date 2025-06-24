@@ -164,7 +164,7 @@ fi
 dest_tmp_dir=$(mktemp -d)
 
 cleanup() {
-  find "$dest_tmp_dir" -type f -name "*.grist" -exec shred -z {} \;
+  find "$dest_tmp_dir" -type f \( -name "*.grist" -o -name "*.sha256" \) -exec shred -z {} \;
   rm -rf "$dest_tmp_dir"
 }
 

@@ -59,6 +59,12 @@ describe("API", function () {
     }
   });
 
+  /**
+   * Small util to either return the same value if the parameter is already an array
+   * or creates an array of a single element
+   */
+  const enforceArray = (val) => [].concat(val);
+
   async function createDoc(name) {
     const res = await axios.post(
       url(`/api/workspaces/${workspaceId}/docs`),
@@ -77,7 +83,7 @@ describe("API", function () {
     const res = await axios.post(
       url(`/api/docs/${docId}/tables/${tableId}/records`),
       {
-        records: [record],
+        records: enforceArray(record),
       },
       {
         headers: headers(),
@@ -110,6 +116,26 @@ describe("API", function () {
     );
     assert.equal(res.status, 200, "Failed to read table records");
     return res.data.records;
+  }
+
+  async function setDocSettings(docId, docSettings) {
+    const changeSettingsUrl = url(
+      `/api/docs/${docId}/tables/_grist_DocInfo/records`,
+    );
+    await axios.patch(
+      changeSettingsUrl,
+      {
+        records: [
+          {
+            id: 1,
+            fields: { documentSettings: JSON.stringify(docSettings) },
+          },
+        ],
+      },
+      {
+        headers: headers(),
+      },
+    );
   }
 
   // This is the most basic test
@@ -221,6 +247,49 @@ describe("API", function () {
       numUsersBefore + 100,
       "Does not have the expected number of invitations",
     );
+  });
+
+  it("should format the number according to the language specified in the doc settings", async () => {
+    const docId = await createDoc("doc-format-numbers");
+    const tableId = "Table1";
+    const lastColRegex = /(?<=,)("[^"]*"|[^,]*)$/gm;
+    await addColumn(docId, tableId, "Num", {
+      type: "Numeric",
+      label: "Num",
+      widgetOptions: JSON.stringify({
+        alignment: "right",
+        numMode: "currency",
+        currency: "EUR",
+      }),
+    });
+    await addRecord(docId, tableId, [
+      { fields: { Num: 0.5 } },
+      { fields: { Num: 42_000 } },
+    ]);
+    const csvExportApi = url(
+      `/api/docs/${docId}/download/csv?viewSection=1&tableId=${tableId}`,
+    );
+
+    await setDocSettings(docId, { locale: "en-US" });
+    const csvUSLocalized = await axios.get(csvExportApi, {
+      headers: headers(),
+    });
+    assert.deepEqual(csvUSLocalized.data.match(lastColRegex), [
+      "Num",
+      "€0.50",
+      '"€42,000.00"',
+    ]);
+
+    await setDocSettings(docId, { locale: "fr-FR" });
+    const csvFRLocalized = await axios.get(csvExportApi, {
+      headers: headers(),
+    });
+    const thousandsSeparatorFR = "\u202f";
+    assert.deepEqual(csvFRLocalized.data.match(lastColRegex), [
+      "Num",
+      '"0,50 €"',
+      `"42${thousandsSeparatorFR}000,00 €"`,
+    ]);
   });
 
   // This test ensures that the S3 provider is correctly configured and handles versions correctly.

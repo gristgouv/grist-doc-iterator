@@ -75,16 +75,14 @@ begin;
 
 UPDATE workspaces set name=(name || '${moved_suffix}'), org_id=(SELECT t.org_id from target_info t) where id in (SELECT s.workspace_id from source_info s) returning *; -- Change workspace orgs and rename their name won't conflict with the target organization ones
 
-WITH source_and_target_org_id_match as (
-  select src_grp.id as src_grp_id, dst_grp.id as dst_grp_id
-  from groups src_grp join groups dst_grp on src_grp.name=dst_grp.name
-    join acl_rules src_ar on src_grp.id=src_ar.id
-    join acl_rules dst_ar on dst_grp.id=dst_ar.id
-  where src_ar.org_id=(select distinct(org_id) from source_info) and dst_ar.org_id=(select distinct(org_id) from target_info)
-)
+WITH old_groups AS (select * from groups g join acl_rules acl on g.id = acl.group_id where acl.org_id=(select distinct(org_id) from source_info)),
+new_groups AS (select * from groups g join acl_rules acl on g.id = acl.group_id where acl.org_id=(select distinct(org_id) from target_info)),
+acl_group_match AS (SELECT og.group_id as oldgroupid, ng.group_id as newgroupid FROM old_groups og
+JOIN new_groups ng ON og.name = ng.name)
+
 UPDATE group_groups
-set subgroup_id=(select dst_grp_id from source_and_target_org_id_match where src_grp_id=subgroup_id)
-where subgroup_id in (select src_grp_id from source_and_target_org_id_match) returning *; -- Make moved workspace inherit their rights from the target org
+SET subgroup_id = (SELECT newgroupid FROM acl_group_match WHERE oldgroupid=subgroup_id)
+WHERE subgroup_id in (select oldgroupid from acl_group_match) returning *; -- Make moved workspace inherit their rights from the target org
 
 update group_users set user_id=(select distinct(user_id) from target_info)
 where user_id=(select distinct(user_id) from source_info)

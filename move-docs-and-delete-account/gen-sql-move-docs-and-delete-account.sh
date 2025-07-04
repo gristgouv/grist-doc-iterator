@@ -91,14 +91,14 @@ where user_id=(select distinct(user_id) from source_info)
 and not exists (select 1 from group_users gu where group_users.group_id=gu.group_id and gu.user_id=(select distinct(user_id) from target_info))
 returning *; -- Remove every permissions of the old user and grant them to the new one, if not already existing
 
-delete from group_users where user_id=(select distinct(user_id) from source_info) returning *;
+delete from group_users where user_id=(select distinct(user_id) from source_info) returning *; -- Remove the old user from the groups where the new user was already present
 
 update docs set created_by=(select distinct(user_id) from target_info) where created_by=(select distinct(user_id) from source_info) returning *; -- Update the docs so they are marked as being created by the new account instead. FIXME: required? A good idea regarding the history?
 
 UPDATE aliases set org_id=(select distinct(org_id) from target_info) where doc_id in (select d.id from docs d join source_info s on d.workspace_id=s.workspace_id) returning *; -- Update the org in the aliases.
 
 -- Delete the old account
-delete from acl_rules where acl_rules.org_id=(select id from orgs where orgs.owner_id=(select distinct(user_id) from source_info));
+DELETE from acl_rules where acl_rules.org_id=(select id from orgs where orgs.owner_id=(select distinct(user_id) from source_info));
 DELETE from logins where user_id=(select distinct(user_id) from source_info);
 DELETE from orgs where owner_id=(select distinct(user_id) from source_info);
 DELETE from users where id=(select distinct(user_id) from source_info);

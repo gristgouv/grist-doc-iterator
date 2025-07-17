@@ -21,6 +21,8 @@ on:
           - tests preprod
           - tests latest
         default: tests latest
+  schedule:
+    - cron: 0 8 * * *
 
 jobs:
   run-integration-tests:

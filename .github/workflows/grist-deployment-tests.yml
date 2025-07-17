@@ -13,11 +13,19 @@ on:
       - grist-deployment-tests/
   # Allows running this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to run the tests on
+        type: choice
+        options:
+          - tests preprod
+          - tests latest
+        default: tests latest
 
 jobs:
   run-integration-tests:
     runs-on: ubuntu-latest
-    environment: deployment tests
+    environment: ${{ inputs.environment || "tests latest" }}
 
     steps:
     - name: Checkout repository

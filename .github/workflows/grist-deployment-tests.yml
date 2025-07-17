@@ -36,7 +36,7 @@ jobs:
     - name: Run the API tests
       shell: bash
       env:
-        GRIST_DOMAIN: ${{ secrets.GRIST_DOMAIN }}
+        GRIST_DOMAIN: ${{ vars.GRIST_DOMAIN }}
         USER_API_KEY: ${{ secrets.USER_API_KEY }}
 
       run: |
@@ -46,7 +46,7 @@ jobs:
     - name: Run the e2e tests
       shell: bash
       env:
-        GRIST_DOMAIN: ${{ secrets.GRIST_DOMAIN }}
+        GRIST_DOMAIN: ${{ vars.GRIST_DOMAIN }}
 
       run: |
         cd grist-deployment-tests

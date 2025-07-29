@@ -1,4 +1,3 @@
-import assert from "node:assert";
 import { expect } from "@wdio/globals";
 import HomePage from "../pageobjects/homepage.page.js";
 import LoginPage from "../pageobjects/login.page.js";

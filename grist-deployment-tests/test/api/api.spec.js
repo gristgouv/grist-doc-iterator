@@ -218,13 +218,10 @@ describe("API", function () {
       ),
       "Already have fake yopmail users, please clean up the org.",
     );
-    const emailsToInvite = new Array(100).fill(null).reduce(
-      (acc, _, index) =>
-        Object.assign(acc, {
-          [`user${index + 1}@yopmail.com`]: "viewers",
-        }),
-      {},
-    );
+    const emailsToInvite = new Array(100).fill(null).reduce((acc, _, index) => {
+      acc[`user${index + 1}@yopmail.com`] = "viewers";
+      return acc;
+    }, {});
     const res = await axios.patch(
       url(`/api/docs/${docId}/access`),
       {

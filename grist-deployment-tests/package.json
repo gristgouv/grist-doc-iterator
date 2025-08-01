@@ -16,9 +16,9 @@
   "author": "fflorent",
   "license": "Apache-2.0",
   "dependencies": {
-    "@wdio/cli": "^9.16.2",
-    "axios": "^1.10.0",
-    "chai": "^5.2.0",
+    "@wdio/cli": "^9.18.4",
+    "axios": "^1.11.0",
+    "chai": "^5.2.1",
     "mocha": "^11.7.1"
   },
   "devDependencies": {

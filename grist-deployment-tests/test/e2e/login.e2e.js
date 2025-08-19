@@ -6,13 +6,10 @@ describe("Login", () => {
   it("should login and logout with valid credentials using ProConnect OIDC Identity Provider", async () => {
     // Given
     await HomePage.open();
-    if (await HomePage.maintenancePopin.isDisplayed()) {
-      await HomePage.acknowledgeMaintenance();
-    }
     await HomePage.goToLogin();
 
     // When
-    await LoginPage.login("user@yopmail.com", "user@yopmail.com");
+    await LoginPage.login();
 
     // Then
     await expect(HomePage.userIcon).toBeDisplayed();

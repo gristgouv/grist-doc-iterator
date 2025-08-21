@@ -48,6 +48,8 @@ jobs:
       env:
         GRIST_DOMAIN: ${{ vars.GRIST_DOMAIN }}
         USER_API_KEY: ${{ secrets.USER_API_KEY }}
+        USER_LOGIN: ${{ secrets.USER_LOGIN }}
+        USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
 
       run: |
         cd grist-deployment-tests

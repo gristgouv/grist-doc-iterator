@@ -28,7 +28,10 @@ class LoginPage extends Page {
    * a method to encapsule automation code to interact with the page
    * e.g. to login using username and password
    */
-  async login(email, password) {
+  async login(
+    email = process.env.USER_LOGIN,
+    password = process.env.USER_PASSWORD,
+  ) {
     await this.inputEmail.setValue(email);
     await this.btnSubmit.click();
     await this.inputPassword.setValue(password);

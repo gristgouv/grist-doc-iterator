@@ -1,9 +1,47 @@
-# 🧰 Grist utils by the French administration
+# Doc iterator
 
-This repository gathers many utils made by the French administration. You may go through the folders to discover each of them.
+**Status: ✅ Ready to be used in production**
 
-## Status of these utils
+⚠️: Despite our efforts to avoid bugs in this script, please check your
+backups before running it, especially if you intend to use the `-w` option.
 
-These utils are provided **AS IS**, WITHOUT WARRANTY OF ANY KIND.
+This script allows you to run scripts on each Grist document in your S3 bucket.
 
-The statuses and the documentation given for these scripts are just informative. It is the responsibility of their user to review the code they are about to run, and understand the consequences.
+## Use case
+
+It covers many use cases:
+ - you want to extract information about each document (like the widgets being used);
+ - you want to vacuum the documents to reduce their size;
+ - ...
+
+💡 Notes: You have published under the [`scripts/`](scripts/) subfolder some scripts that may be of interest.
+
+## Usage
+
+See `./doc-iterator.sh --help`.
+
+### Example of use
+
+*vacuum.sh*
+```bash
+#!/usr/bin/env bash
+set -eEuo pipefail
+
+$SQLITE3 "$1" "vacuum"
+```
+
+*list-tables.sh*
+```bash
+#!/usr/bin/env bash
+set -eEuo pipefail
+
+doc_id=$(basename -s ".grist" "$1")
+$SQLITE3 "$1" ".tables" > "/tmp/${doc_id}.txt"
+```
+
+*To run it now on staging environment (given `staging-grist` is an alias registered in your minio client configuration):*
+```bash
+$ chmod u+x  ./vacuum.sh ./list-tables.sh
+$ bash ./doc-iterator.sh -w staging-grist/grist-preprod-grist/docs/ ./vacuum.sh ./list-tables.sh
+```
+

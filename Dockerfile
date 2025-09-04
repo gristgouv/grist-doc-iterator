@@ -13,5 +13,7 @@ WORKDIR /app
 COPY .sqliterc /home/grist
 COPY doc-iterator.sh scripts ./
 
+ENV MINIO_MC=mcli
+
 CMD [ "bash", "doc-iterator.sh", "-h" ]
 

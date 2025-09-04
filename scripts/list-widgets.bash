@@ -24,3 +24,5 @@ SELECT '${filename%.grist}' as ID,
 FROM _grist_Views_section 
 WHERE options is not null and options <> '';
 EOF
+
+cat /tmp/widgets.csv

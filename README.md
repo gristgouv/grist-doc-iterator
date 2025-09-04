@@ -20,6 +20,12 @@ It covers many use cases:
 
 See `./doc-iterator.sh --help`.
 
+## Configuring mc alias
+
+For local use, an alias can be created for `mc` using `mc alias set <ALIAS> <URL> <ACCESSKEY> <SECRETKEY>`.
+
+For container use, the alias can also be configure using an environment variable using this format: `MC_HOST_<alias>=https://<Access Key>:<Secret Key>@<YOUR-S3-ENDPOINT>`.
+
 ### Example of use
 
 *vacuum.sh*

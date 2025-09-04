@@ -1,0 +1,4 @@
+# configure trusted_schema off in case it's not the default
+.dbconfig trusted_schema off
+# run integrity check when opening DB
+.intck 1

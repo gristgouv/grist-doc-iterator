@@ -8,7 +8,7 @@ DESTINATION=/tmp/widgets.csv
 
 # Add headers only if the destination is missing
 MAYBE_HEADER_OPT=""
-if [ ! -f "$DESTINATION" ] || [ "$(stat --printf="%s" "$DESTINATION")" -eq 0 ]; then
+if [ ! -f "$DESTINATION" ] || [ "$(stat -c="%s" "$DESTINATION")" -eq 0 ]; then
   MAYBE_HEADER_OPT="-header"
 fi
 if [ ! -f "$GRIST_FILE" ]; then

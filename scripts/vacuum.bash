@@ -22,8 +22,8 @@ trap "cleanup" EXIT
 
 $SQLITE3 "$GRIST_FILE" "vacuum into '$VACUUMED'"
 
-orig_size=$(stat --printf="%s" "$GRIST_FILE")
-new_size=$(stat --printf="%s" "$VACUUMED")
+orig_size=$(stat -c="%s" "$GRIST_FILE")
+new_size=$(stat -c="%s" "$VACUUMED")
 
 # If the new size is considerably lighter
 if [ "$(bc -l <<< "$new_size < $orig_size * 0.9")" -eq 1 ]; then

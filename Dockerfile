@@ -1,19 +1,16 @@
-FROM alpine:3.22.1
+FROM python:3.13-alpine
 
-RUN apk add --no-cache \
-  sqlite=3.49.2-r1 \
-  minio-client=0.20250521.015954-r1 \
-  bash=5.2.37-r0 \
-  jq=1.8.0-r0
-
-RUN addgroup -S grist && adduser -S grist -G grist
-USER grist
 WORKDIR /app
 
-COPY .sqliterc /home/grist
-COPY doc-iterator.sh scripts ./
+# install dependencies
+COPY uv.lock pyproject.toml ./
+RUN apk add bash jq minio-client sqlite
+RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv uv export --no-dev --locked > requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# install source
+COPY main.py scripts doc-iterator.sh ./
 
 ENV MINIO_MC=mcli
-
-CMD [ "bash", "doc-iterator.sh", "-h" ]
+ENTRYPOINT [ "python", "main.py" ]
 

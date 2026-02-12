@@ -164,7 +164,6 @@ fi
 dest_tmp_dir=$(mktemp -d)
 
 cleanup() {
-  find "$dest_tmp_dir" -type f \( -name "*.grist" -o -name "*.sha256" \) -exec shred -z {} \;
   rm -rf "$dest_tmp_dir"
 }
 
@@ -200,5 +199,5 @@ for file in $files; do
   fi
 
   # Remove the temporary file
-  shred -zu "$tmp_file" "$tmp_file_sha256"
+  rm "$tmp_file" "$tmp_file_sha256"
 done

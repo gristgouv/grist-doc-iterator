@@ -1,0 +1,16 @@
+[project]
+name = "grist-doc-iterator-wrapper"
+version = "0.1.0"
+description = "Wrapper that runs the Grist doc iterator and pushes the result to Grist"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "requests>=2.32.4",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.12.0",
+]
+
+[tool.black]
